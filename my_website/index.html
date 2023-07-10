@@ -15,7 +15,8 @@
     <div class="container mx-auto">
         <header>
             <nav class="flex justify-between">
-                <div class="logo font-bold flex items-center text-blue">Just4Passion</div>
+                <!-- <div class="logo font-bold flex items-center text-blue">Just4Passion</div> -->
+                
                 <ul class="navbar flex items-center">
                     <li>Home</li>
                     <li>About</li>
@@ -36,7 +37,7 @@
                         <h1 class="my-1 text-center">Pallete of Imagination!</h1>
                         <p class=" text-center">Buckets and Brushes are your best friend at tough times if you are an artist</p>
                             <!-- Display the countdown timer in an element -->
-                            <p class="deal text-center">The deal ends in <span id="demo"></span></p>
+                            <!-- <p class="deal text-center">The deal ends in <span id="demo"></span></p> -->
                             <div class="buttons">
                                 <button class="btn">Fill your cart with Art</button>
                                 <button class="btn">Contact Us</button>
@@ -146,6 +147,35 @@
             </section>
             <hr>
         </main>
+        <h1 class="text-center my-2">FAQ's</h1>
+        <button class="accordion">Do you deliver internationaly?</button>
+<div class="panel">
+  <p>No,right now we only deliver in India</p>
+</div>
+
+<button class="accordion">What are the shipment charges?</button>
+<div class="panel">
+  <p> It depends on the pincode</p>
+</div>
+
+
+<script>
+var acc = document.getElementsByClassName("accordion");
+var i;
+
+for (i = 0; i < acc.length; i++) {
+  acc[i].addEventListener("click", function() {
+    this.classList.toggle("active");
+    var panel = this.nextElementSibling;
+    if (panel.style.maxHeight) {
+      panel.style.maxHeight = null;
+    } else {
+      panel.style.maxHeight = panel.scrollHeight + "px";
+    } 
+  });
+}
+</script>
+
         <footer>
             Copyright &copy; Just4Passion.com | All rights reserved
         </footer>
