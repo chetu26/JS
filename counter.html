@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Counter</title>
+</head>
+<body>
+    <button id="add-counter-btn">Add Counter</button>
+    <div id="counters-container"></div>
+
+    <script>
+        let counterId = 1; // Counter ID to keep track of each counter
+
+        function createCounter() {
+            const counterContainer = document.createElement('div');
+            const counterElement = document.createElement('span');
+            const currentCounterId = counterId; // Store the current counter ID
+
+            counterContainer.id = `counter-${currentCounterId}`;
+            counterElement.innerHTML = `Counter ${currentCounterId}: 0`;
+            counterContainer.appendChild(counterElement);
+            document.getElementById('counters-container').appendChild(counterContainer);
+
+            let count = 0; // Initial count for the counter
+
+            // Update the counter every second
+            const intervalId = setInterval(() => {
+                count++;
+                counterElement.innerHTML = `Counter ${currentCounterId}: ${count}`;
+            }, 1000);
+
+            counterId++; // Increment the counter ID for the next counter
+        }
+
+        const addCounterButton = document.getElementById('add-counter-btn');
+        addCounterButton.addEventListener('click', createCounter);
+    </script>
+</body>
+</html>

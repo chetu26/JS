@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student List</title>
+  <style>
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+    }
+    .pass {
+      background-color: #d0f0d0;
+    }
+    .fail {
+      background-color: #f0d0d0;
+    }
+    tr:hover {
+      background-color: #e0e0e0;
+    }
+  </style>
+</head>
+<body>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email Address</th>
+        <th>Phone Number</th>
+        <th>Percentage</th>
+        <th>Hobbies</th>
+      </tr>
+    </thead>
+    <tbody id="student-list">
+      <!-- Student data will be dynamically added here -->
+    </tbody>
+  </table>
+
+  <button id="add-btn">Add New Student</button>
+  <button id="failed-btn">Display Failed Students</button>
+  <button id="pass-btn">Display Pass Students</button>
+
+  <div id="form-container" style="display: none;">
+    <h2>Add New Student</h2>
+    <form id="student-form">
+      <label for="name">Name:</label>
+      <input type="text" id="name" required>
+
+      <label for="email">Email Address:</label>
+      <input type="email" id="email" required>
+
+      <label for="phone">Phone Number:</label>
+      <input type="text" id="phone" pattern="[0-9]{10}" required>
+
+      <label for="percentage">Percentage:</label>
+      <input type="number" id="percentage" min="0" max="100" required>
+
+      <label for="hobbies">Hobbies (enter one or more, up to 5):</label>
+      <textarea id="hobbies" required></textarea>
+
+      <button type="submit">Save</button>
+    </form>
+  </div>
+
+  <script>
+    // Student data in JSON format
+    let students = [
+      {
+        "name": "John Doe",
+        "email": "johndoe@example.com",
+        "phone": "1234567890",
+        "percentage": 85,
+        "hobbies": ["Reading", "Sports"]
+      },
+      {
+        "name": "Jane Smith",
+        "email": "janesmith@example.com",
+        "phone": "9876543210",
+        "percentage": 35,
+        "hobbies": ["Music", "Painting"]
+      },
+      // Add more student objects here
+    ];
+
+    // Get the student list table body element
+    const studentList = document.getElementById('student-list');
+
+    // Render the student list table
+    function renderStudentList(data = students) {
+      studentList.innerHTML = '';
+
+      data.forEach((student, index) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td data-field="name" data-index="${index}">${student.name}</td>
+          <td data-field="email" data-index="${index}">${student.email}</td>
+          <td data-field="phone" data-index="${index}">${student.phone}</td>
+          <td data-field="percentage" data-index="${index}">${student.percentage}</td>
+          <td data-field="hobbies" data-index="${index}">${student.hobbies.join(', ')}</td>
+        `;
+        row.addEventListener('click', handleRowClick);
+        studentList.appendChild(row);
+
+        // Set background color based on pass/fail status
+        const status = getStudentStatus(student);
+        row.classList.add(status.toLowerCase());
+      });
+    }
+
+    // Get the student status (PASS/FAIL) based on percentage
+    function getStudentStatus(student) {
+      return student.percentage > 40 ? 'PASS' : 'FAIL';
+    }
+
+    // Open the form to add a new student
+    function openForm() {
+      document.getElementById('form-container').style.display = 'block';
+    }
+
+    // Close the form
+    function closeForm() {
+      document.getElementById('form-container').style.display = 'none';
+    }
+
+    // Clear the form inputs
+    function clearForm() {
+      document.getElementById('student-form').reset();
+    }
+
+    // Validate form inputs
+    function validateForm() {
+      const nameInput = document.getElementById('name');
+      const emailInput = document.getElementById('email');
+      const phoneInput = document.getElementById('phone');
+      const percentageInput = document.getElementById('percentage');
+      const hobbiesInput = document.getElementById('hobbies');
+
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const phonePattern = /^\d{10}$/;
+
+      if (!nameInput.value || !emailInput.value || !phoneInput.value || !percentageInput.value || !hobbiesInput.value) {
+        alert('Please fill in all fields.');
+        return false;
+      }
+
+      if (!emailPattern.test(emailInput.value)) {
+        alert('Please enter a valid email address.');
+        return false;
+      }
+
+      if (!phonePattern.test(phoneInput.value)) {
+        alert('Please enter a valid 10-digit phone number.');
+        return false;
+      }
+
+      const percentage = parseInt(percentageInput.value);
+      if (isNaN(percentage) || percentage < 0 || percentage > 100) {
+        alert('Please enter a valid percentage (0-100).');
+        return false;
+      }
+
+      const hobbies = hobbiesInput.value.trim().split('\n').map(hobby => hobby.trim()).filter(hobby => hobby !== '');
+      if (hobbies.length === 0) {
+        alert('Please enter at least one hobby.');
+        return false;
+      }
+
+      if (hobbies.length > 5) {
+        alert('You can only enter up to 5 hobbies.');
+        return false;
+      }
+
+      return true;
+    }
+
+    // Filter students based on pass or fail status
+    function filterStudentsByStatus(status) {
+      if (status === 'failed') {
+        return students.filter(student => student.percentage <= 40);
+      } else if (status === 'passed') {
+        return students.filter(student => student.percentage > 40);
+      }
+      return students;
+    }
+
+    // Handle click event on failed students button
+    document.getElementById('failed-btn').addEventListener('click', function() {
+      const failedStudents = filterStudentsByStatus('failed');
+      renderStudentList(failedStudents);
+    });
+
+    // Handle click event on pass students button
+    document.getElementById('pass-btn').addEventListener('click', function() {
+      const passStudents = filterStudentsByStatus('passed');
+      renderStudentList(passStudents);
+    });
+
+    // Handle row click event to edit student details
+    function handleRowClick(event) {
+      const target =event.target;
+      const field = target.getAttribute('data-field');
+      const index = parseInt(target.getAttribute('data-index'));
+
+      if (field && index >= 0) {
+        const value = target.textContent;
+
+        // Create an input element with the current value
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.value = value;
+
+        // Replace the text content with the input element
+        target.textContent = '';
+        target.appendChild(input);
+
+        // Focus the input and select its content
+        input.focus();
+        input.select();
+
+        // Update student details on input blur or Enter key press
+        input.addEventListener('blur', () => updateStudentDetails(field, index, input.value));
+        input.addEventListener('keydown', (event) => {
+          if (event.key === 'Enter') {
+            updateStudentDetails(field, index, input.value);
+          }
+        });
+      }
+    }
+
+    // Update student details
+    function updateStudentDetails(field, index, value) {
+      const student = students[index];
+      student[field] = value;
+
+      renderStudentList();
+    }
+
+    // Add a new student to the list
+    function addStudent(event) {
+      event.preventDefault();
+
+      if (!validateForm()) {
+        return;
+      }
+
+      const nameInput = document.getElementById('name');
+      const emailInput = document.getElementById('email');
+      const phoneInput = document.getElementById('phone');
+      const percentageInput = document.getElementById('percentage');
+      const hobbiesInput = document.getElementById('hobbies');
+
+      const newStudent = {
+        name: nameInput.value,
+        email: emailInput.value,
+        phone: phoneInput.value,
+        percentage: parseInt(percentageInput.value),
+        hobbies: hobbiesInput.value.trim().split('\n').map(hobby => hobby.trim()).filter(hobby => hobby !== '').slice(0, 5)
+      };
+
+      students.push(newStudent);
+      renderStudentList();
+      closeForm();
+      clearForm();
+    }
+
+    // Add event listeners
+    document.getElementById('add-btn').addEventListener('click', openForm);
+    document.getElementById('student-form').addEventListener('submit', addStudent);
+
+    // Initial rendering of the student list
+    renderStudentList();
+  </script>
+</body>
+</html>
